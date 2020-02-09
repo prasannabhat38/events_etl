@@ -6,11 +6,20 @@ ETL_RUN_DIR = 'events_etl/run'
 def get_etl_run_dir():
     return os.path.join(os.getcwd(), '../' + ETL_RUN_DIR)
 
+def get_run_log_filename_for_key(file_key):
+    run_file_name = '-'.join(file_key.split('/')[0:-1]) + '.log'
+    path = os.path.join(get_etl_run_dir(), run_file_name)
+
+    return path
+
 def update_run_log(file_key):
     '''
     Create/Update run file for file_key.
     Each run file name is a date prefix in s3_key and contains all the keys (file)
     with the same date prefix (organised by dated directory)
+
+    for e.g: file_key = 2020/01/01/0f6e0555e9f34063b711a676d13e38f9.json
+    run_log_file = 2020-01-01.log and will contain the entry 0f6e0555e9f34063b711a676d13e38f9.json
 
     :param file_key:
     :return:
@@ -33,6 +42,38 @@ def update_run_log(file_key):
     except Exception as e:
         print 'Error updating run log file'.format(e)
 
+
+def is_event_log_processed(file_key):
+    '''
+    Checks if the file_key is already processed by the ETL processor.
+
+    Each run_log file name is a date prefix in s3_key and contains all the keys (file)
+    with the same date prefix (organised by dated directory). See update_run_log() above
+
+    for e.g: file_key = 2020/01/01/0f6e0555e9f34063b711a676d13e38f9.json
+    run_log_file = 2020-01-01.log and will contain the entry 0f6e0555e9f34063b711a676d13e38f9.json
+
+    :param file_key:
+    :return: True if event_log correspond to file_key is not processed else False
+    :return:
+    '''
+    run_log_file = get_run_log_filename_for_key(file_key)
+    file_key_processed = False
+
+    print 'Checking if the run file exists for path: {}'.format(run_log_file)
+    if os.path.isfile(run_log_file):
+        # If the dated run log file exists check if the key corresponding to S3 event log (.json) exists
+        # If exists then the event log is processed else needs to be processed in this run
+        with open(run_log_file, 'r') as f:
+            s3_event_file_name = file_key.split('/')[-1]
+            line = f.readline()
+
+            while line:
+                if line == s3_event_file_name:
+                    file_key_processed = True
+
+    return file_key_processed
+
 def update_run_status(last_run_status):
     '''
     Updates run status to status_log file
@@ -53,39 +94,4 @@ def update_run_status(last_run_status):
 
 def format_event(raw_event):
     pass
-
-
-def is_event_log_processed(file_key):
-    '''
-    Checks if the file_key is already processed by the ETL processor.
-
-    :param file_key:
-    :return: True if log correspond to file_key is not processed else False
-    :return:
-    '''
-    # Run file name will be dated from the s3 file_key
-    # e.g. 2020/01/01/<file>.json will correspond to 2020-01-01.log in run dir
-
-    run_file_name = '-'.join(file_key.split('/')[0:-1]) + '.log'
-    s3_event_file_name = file_key.split('/')[-1]
-
-    path = os.path.join(get_etl_run_dir(), run_file_name)
-
-    print 'Checking if the run file exists for path: {}'.format(path)
-
-    file_key_processed = False
-
-    if os.path.isfile(path):
-        # If the dated run log file exists check if the key corresponding to S3 event log (.son) exists
-        # If exists then the event log is processed else needs to be processed in this run
-
-        with open(path, 'r') as f:
-
-            line = f.readline()
-
-            while line:
-                if line == s3_event_file_name:
-                    file_key_processed = True
-
-    return file_key_processed
 

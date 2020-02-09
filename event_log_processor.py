@@ -58,7 +58,7 @@ class EventLogProcessor:
                 traceback.print_exc()
 
             update_run_log(key)
-        
+
         return 'SUCCESS' if run_status else 'FAILED'
 
     def process(self):
