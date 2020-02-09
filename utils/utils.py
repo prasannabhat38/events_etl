@@ -38,6 +38,7 @@ def update_run_log(file_key):
                 f.write(s3_event_file_name)
         else:
             with open(path, 'a') as f:
+                f.write('\n')
                 f.write(s3_event_file_name)
     except Exception as e:
         print 'Error updating run log file'.format(e)
