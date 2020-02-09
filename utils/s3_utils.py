@@ -76,8 +76,3 @@ def get_s3_file(s3_key):
 
     return file_obj['Body']
 
-if __name__ == '__main__':
-    s3_keys = get_s3_keys_for_events('2020/01/01')
-
-    events_data_handle = get_file(s3_keys[0])
-    #_read_file(events_data_handle)
