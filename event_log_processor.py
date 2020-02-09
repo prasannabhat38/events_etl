@@ -1,9 +1,10 @@
 from datetime import datetime
 import json
+import traceback
+
 from utils.s3_utils import get_s3_keys_for_events_log
 from utils.s3_utils import get_s3_file
 from utils.utils import is_event_log_processed
-import traceback
 
 class EventLogProcessor:
     '''
@@ -12,7 +13,7 @@ class EventLogProcessor:
 
     def _read_events_log(self, file_key):
         file_obj = get_s3_file(file_key)
-
+        # reading s3 file stream line by line to handle parse issues with invalid event logs
         row = file_obj._raw_stream.readline()
 
         while row:
@@ -53,18 +54,19 @@ class EventLogProcessor:
         '''
         Start processing events log from S3.
 
-        1. Checks if there are new files to be processed in S3 events log
-        2. Read file and parse the events message
-        3. Update run_dir for new files processed and update last_run timestamp
+        1. Read keys from S3 bucket for event logs
+        2. Check if there are new files to be processed
+        3. Read file (by key) and parse the events message
+        4. Update run_dir for new files processed and
+        5. Update last_run timestamp
 
-        :return: list of processed Event messages
+        :return: outputs processed Event messages
         '''
         print 'Starting events processor. start_time: {}'.format(datetime.now())
         start_time = datetime.now()
 
         try:
-            event_log_keys = get_s3_keys_for_events_log()
-
+            event_log_keys = get_s3_keys_for_events_log(path_prefix='/')
             self._process_events_log(event_log_keys)
         except Exception as e:
             print 'Error processing events log.'.format(e)
@@ -73,4 +75,3 @@ class EventLogProcessor:
         end_time = datetime.now()
 
         print 'Finished processing events. end_time: {}. Time taken: {}'.format(end_time, end_time-start_time)
-

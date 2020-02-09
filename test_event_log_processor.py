@@ -2,7 +2,7 @@ from event_log_processor import EventLogProcessor
 
 class TestEventLogProcessor():
     '''
-
+    Test EventLogProcessor ETL process
     '''
 
     def __init__(self):
