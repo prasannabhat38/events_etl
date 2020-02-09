@@ -71,6 +71,8 @@ def is_event_log_processed(file_key):
             while line:
                 if line == s3_event_file_name:
                     file_key_processed = True
+                    break
+                line = f.readline()
 
     return file_key_processed
 
