@@ -13,3 +13,7 @@ The S3 location s3://dataeng-challenge/8uht6u8bh/events/ contains a number of ev
 
 The events should contain the following keys: id, created_at, user_email, ip, event_name and metadata. The metadata is specific to each event, and may contain anything.
 
+# Future Optimisations
+1. Asynchronous processing: Fetch the s3_keys and send each key to a Queue (SQS, ActiveMQ) for asynchronous processing
+2. Download the file to local disk and process. Makes processing faster by cutting down on network latency while reading file directly from S3.
+3. Use multithreading for parallelisation but will still consume a lot of local machine memory
