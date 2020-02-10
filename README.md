@@ -75,7 +75,8 @@ Sample output from the processed S3 event log:
 # Set up / Testing
 1.Set up a new virtual-env (see https://realpython.com/python-virtual-environments-a-primer/)
  Install boto3 for accessing AWS S3 via APIs
- pip install boto3
+ 
+ 'pip install boto3'
 
 2. Update AWS access_key_id and secret_access_key in 'events_etl/aws_config'
 
