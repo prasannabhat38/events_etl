@@ -5,9 +5,9 @@ from s3_utils import get_s3_file
 
 # Metadata can have arbitrary keys based on the event type
 # This map will maintain the list of keys specific to an event type to provide additional context
-
-# Note: Update the map for any new_event_type or
-# adding new metdata key to an event for it to be added to final message
+# Note: Update the map for any new_event_type or adding new metdata key to an
+# event for it to be added to final message
+# TODO: make it a config
 
 METADATA_KEYS_DICT = {
                         'change_operator_identity' : ['action'],
