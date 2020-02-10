@@ -52,8 +52,6 @@ class EventLogProcessor:
 
             update_run_log(key)
 
-            break
-
         return 'SUCCESS' if run_status else 'FAILED'
 
     def process(self, clear_prev_run=False, output_to_file=False):
