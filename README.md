@@ -73,7 +73,11 @@ Sample output from the processed S3 event log:
 }
 
 # Set up / Testing
-Update AWS access_key_id and secret_access_key in events_etl/aws_config
+Lib required: boto3, json
+pip install boto3
+pip install json
+
+Update AWS access_key_id and secret_access_key in 'events_etl/aws_config'
 
 Run events_etl/tests.py
 
