@@ -25,6 +25,7 @@ Below are the processing steps:
 6. Update last_run timestamp and status
 
 Sample output from the processed S3 event log:
+
 {
   "file_key": "/Users/prasannak/tmp/events/2020/01/01/0f6e0555e9f34063b711a676d13e38f9.json",
 
@@ -63,7 +64,9 @@ Sample output from the processed S3 event log:
 }
 
 # Set up / Testing
-See events_etl/tests.py
+Update AWS key id and secret_access_key in events_etl/aws_config
+
+Run events_etl/tests.py
 
 # Further enhancements/ optimisations
 
