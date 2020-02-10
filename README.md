@@ -73,16 +73,16 @@ Sample output from the processed S3 event log:
 }
 
 # Set up / Testing
-Lib required: boto3, json
+1.Set up a new virtual-env (see https://realpython.com/python-virtual-environments-a-primer/)
+Install boto3 for accessing AWS S3 via APIs
 pip install boto3
-pip install json
 
-Update AWS access_key_id and secret_access_key in 'events_etl/aws_config'
+2. Update AWS access_key_id and secret_access_key in 'events_etl/aws_config'
 
-Run events_etl/tests.py
+3. cd events_etl; python -m tests
 
 # Further enhancements/ optimisations
-
+Enha
 Performance improvements:
 1. Asynchronous processing: Fetch the s3_keys and send each key to a Queue (SQS, ActiveMQ) for asynchronous processing
 2. Download the file to local disk and process. Makes processing faster by cutting down on network latency while reading file directly from S3.
