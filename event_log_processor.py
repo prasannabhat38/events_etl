@@ -3,7 +3,7 @@ import json
 import traceback
 
 from utils.s3_utils import get_s3_keys_for_events_log
-from utils.s3_utils import get_s3_file
+from utils.event_parser import parse_event_log
 from utils.utils import is_event_log_processed
 from utils.utils import update_run_log
 from utils.utils import update_run_status
@@ -12,27 +12,14 @@ class EventLogProcessor:
     '''
     Class to process application events log and load to Redshift.
     '''
+    def _push_events(self, events):
+        '''
+        Push events to DB (Redshift) or it could be any further downstream processor
 
-    def _read_event_log(self, file_key):
-        print 'Reading file for key: {}'.format(file_key)
-        start_time = datetime.now()
+        :return:
+        '''
 
-        file_obj = get_s3_file(file_key)
-        # reading s3 file stream line by line to handle parse issues with invalid event logs
-        row = file_obj._raw_stream.readline()
-
-        while row:
-            # Handle bad rows
-            try:
-                event_json = json.loads(row)
-                # event = self._format_event(event_json)
-            except Exception as e:
-                print 'Error converting event message [{}] to JSON. skipping row'.format(row)
-
-            row = file_obj._raw_stream.readline()
-
-        end_time = datetime.now()
-        print 'Finished reading file. Time taken: {}'.format(end_time-start_time)
+        # TODO:
 
     def _process_events_log(self, s3_keys):
         '''
@@ -51,13 +38,16 @@ class EventLogProcessor:
                 is_processed = is_event_log_processed(key)
 
                 if not is_processed:
-                    self._read_event_log(key)
+                    events_json = parse_event_log(key)
+                    self._push_events(events_json)
             except Exception as e:
                 run_status = False
                 print 'Exception: error occurred processing key: {}.'.format(key)
                 traceback.print_exc()
 
             update_run_log(key)
+
+            break
 
         return 'SUCCESS' if run_status else 'FAILED'
 
