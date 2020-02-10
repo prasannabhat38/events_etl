@@ -98,6 +98,12 @@ def update_run_status(last_run_status):
     except Exception as e:
         print 'Error updating run status file. {}'.format(e)
 
+def delete_old_run_logs(file_keys):
+    for key in file_keys:
+        run_log = get_run_log_filename_for_key(key)
+        if os.path.isfile(run_log):
+            os.remove(run_log)
+
 def dump_output_to_file(file_key, event_response):
     output_dir = os.path.join(os.getcwd(), '../' + OUTPUT_DIR)
     file = os.path.join(output_dir, file_key.split('/')[-1])

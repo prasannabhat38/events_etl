@@ -8,6 +8,7 @@ from utils.run_utils import is_event_log_processed
 from utils.run_utils import update_run_log
 from utils.run_utils import update_run_status
 from utils.run_utils import dump_output_to_file
+from utils.run_utils import delete_old_run_logs
 
 class EventLogProcessor:
     '''
@@ -33,7 +34,7 @@ class EventLogProcessor:
         run_status = True
 
         for key in s3_keys:
-            print 'Processing events for key: {}'.format(key)
+            print '------- Processing events for key: {} ---------'.format(key)
             # Handling exception to continue processing all the keys even if processing breaks for some other files due to invalid msgs
             try:
                 is_processed = is_event_log_processed(key)
@@ -73,6 +74,8 @@ class EventLogProcessor:
 
         try:
             event_log_keys = get_s3_keys_for_events_log(path_prefix='/')
+            delete_old_run_logs(event_log_keys)
+
             run_status = self._process_events_log(event_log_keys, output_to_file)
             update_run_status(run_status)
         except Exception as e:
@@ -82,4 +85,5 @@ class EventLogProcessor:
 
         end_time = datetime.now()
 
-        print 'Finished processing events. end_time: {}. Time taken: {}'.format(end_time, end_time-start_time)
+        print '---- Finished processing events. end_time: {}. Time taken: {}-----'.format(end_time, end_time-start_time)
+
