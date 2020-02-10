@@ -76,8 +76,12 @@ Sample output from the processed S3 event log:
 1.Set up a new virtual-env (see https://realpython.com/python-virtual-environments-a-primer/)
  Install boto3 for accessing AWS S3 via APIs
  pip install boto3
+
 2. Update AWS access_key_id and secret_access_key in 'events_etl/aws_config'
+
 3. cd events_etl; python -m tests
+
+4. The test will invoke the processor and dump the output in 'events_etl/output' folder
 
 # Further enhancements/ optimisations
 Enhancements:
