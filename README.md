@@ -24,6 +24,17 @@ Below are the processing steps:
 5. Push events downstream (to DB or message queue) (TBD)
 6. Update last_run timestamp and status
 
+Other considerations:
+The parser will parse the events raw json and look for specific keys (below) that will be useful for loading to Redshift or any downstream processing. 
+
+event: {
+  *event_name*: <name of the Event>,
+  ip: <source_ip_address> (This might be useful to answer queries around which regions the app is getting used etc, but is not mandatory),
+  created_at: <source event timestamp>,
+  user_email: <user_email> from source,
+  metadata: <json containing any additional metadata for that event from source>. This is optional but you can configure it to look for specific keys for a given event type (for e.g. path for a page_visit event, action for a update_admin event)
+}
+
 Sample output from the processed S3 event log:
 
 {
