@@ -14,7 +14,7 @@ class EventLogProcessor:
     '''
     def _push_events(self, events):
         '''
-        Push events to DB (Redshift) or it could be any further downstream processor
+        Push events to DB (Redshift) or it could be a message queue for downstream processing
 
         :return:
         '''
