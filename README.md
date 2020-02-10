@@ -1,6 +1,6 @@
 # Events ETL
 
-# Project brief
+# Problem Statement
 One of our web apps sends various events related to user behaviour (how and when they interact with the app) for example: visit to a page or use of a given feature. These events are periodically uploaded to an S3 bucket and stored there for 28 days before they’re deleted. We want to be able to query these events, so we can analyse product usage and answer various business questions.
 
 For this challenge, we want you to create a script to prep and clean this clean event data which we could later incorporate into an ETL pipeline where we’ll load this data into a table in our Redshift cluster. You are free to choose the output format of the cleaned data but please explain your decision.
@@ -13,7 +13,61 @@ The S3 location s3://dataeng-challenge/8uht6u8bh/events/ contains a number of ev
 
 The events should contain the following keys: id, created_at, user_email, ip, event_name and metadata. The metadata is specific to each event, and may contain anything.
 
-# Future Optimisations
+# Solution:
+The EventLogProcessor is the main class to process the ETL. The events logs are periodically uploaded to S3 and stored in a directory that follows a date format. The processor will fetch all the keys from the S3 bucket and events dir and pre processes it to see which are the new files to be processed. For this, it creates a 'run' directory containing a 'run_log' (e.g. run_log-2020-01-01.log) file and having all the S3_keys/files processed corresponding to the dated directory.
+
+Below are the processing steps:
+1. Read keys from S3 bucket for event logs
+2. Check if there are new files to be processed
+3. Read file (by key) and parse the events message
+4. Update run_dir for new files processed
+5. Push events downstream (to DB or message queue) (TBD)
+6. Update last_run timestamp and status
+
+Sample output from the processed S3 event log:
+{
+  "file_key": "/Users/prasannak/tmp/events/2020/01/01/0f6e0555e9f34063b711a676d13e38f9.json",
+
+  "events": [
+    {
+      "event_name": "message_saved",
+      "ip": "209.154.163.207",
+      "created_at": "2020-01-30 00:10:35",
+      "user_email": "wallsdenise@thompson.com"
+    },
+    {
+      "event_name": "meeting_invite",
+      "ip": "205.166.191.182",
+      "created_at": "2020-01-29 20:51:59",
+      "user_email": "jessica59@estrada.info"
+    },
+    {
+      "event_name": "page_visit",
+      "ip": "215.71.69.213",
+      "created_at": "2020-01-29 20:38:07",
+      "user_email": "lkidd@ewing-garcia.com",
+      "metadata": {
+        "path": "main/categories/category"
+      }
+    },
+    {
+      "event_name": "change_operator_identity",
+      "ip": "217.41.25.212",
+      "created_at": "2020-01-30 12:02:56",
+      "user_email": "millerjesse@webster-fuentes.org",
+      "metadata": {
+        "action": "update"
+      }
+    },
+  ],
+}
+
+# Set up / Testing
+See events_etl/tests.py
+
+# Further enhancements/ optimisations
+
+Performance improvements:
 1. Asynchronous processing: Fetch the s3_keys and send each key to a Queue (SQS, ActiveMQ) for asynchronous processing
 2. Download the file to local disk and process. Makes processing faster by cutting down on network latency while reading file directly from S3.
 3. Use multithreading for parallelisation but will still consume a lot of local machine memory
