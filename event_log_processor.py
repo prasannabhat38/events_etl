@@ -59,7 +59,8 @@ class EventLogProcessor:
         2. Check if there are new files to be processed
         3. Read file (by key) and parse the events message
         4. Update run_dir for new files processed and
-        5. Update last_run timestamp
+        5. Push events downstream (to DB or message queue)
+        6. Update last_run timestamp
 
         :return: outputs processed Event messages
         '''
