@@ -4,9 +4,10 @@ import traceback
 
 from utils.s3_utils import get_s3_keys_for_events_log
 from utils.event_parser import parse_event_log
-from utils.utils import is_event_log_processed
-from utils.utils import update_run_log
-from utils.utils import update_run_status
+from utils.run_utils import is_event_log_processed
+from utils.run_utils import update_run_log
+from utils.run_utils import update_run_status
+from utils.run_utils import dump_output_to_file
 
 class EventLogProcessor:
     '''
@@ -18,10 +19,10 @@ class EventLogProcessor:
 
         :return:
         '''
+        print 'Pushing events to downstream'
+        #TODO: Push events to DB (Redshift) or it could be a message queue for downstream processing
 
-        # TODO:
-
-    def _process_events_log(self, s3_keys):
+    def _process_events_log(self, s3_keys, output_to_file=False):
         '''
         Start processing events log.
 
@@ -39,6 +40,10 @@ class EventLogProcessor:
 
                 if not is_processed:
                     events_json = parse_event_log(key)
+
+                    if output_to_file:
+                        dump_output_to_file(key, events_json)
+
                     self._push_events(events_json)
             except Exception as e:
                 run_status = False
@@ -51,7 +56,7 @@ class EventLogProcessor:
 
         return 'SUCCESS' if run_status else 'FAILED'
 
-    def process(self):
+    def process(self, clear_prev_run=False, output_to_file=False):
         '''
         Start processing events log from S3.
 
@@ -62,6 +67,7 @@ class EventLogProcessor:
         5. Push events downstream (to DB or message queue)
         6. Update last_run timestamp
 
+        :clear_prev_run: Clears previous runs and processes a previously processed file the event_log. Set it to True for testing
         :return: outputs processed Event messages
         '''
         print 'Starting events processor. start_time: {}'.format(datetime.now())
@@ -69,7 +75,7 @@ class EventLogProcessor:
 
         try:
             event_log_keys = get_s3_keys_for_events_log(path_prefix='/')
-            run_status = self._process_events_log(event_log_keys)
+            run_status = self._process_events_log(event_log_keys, output_to_file)
             update_run_status(run_status)
         except Exception as e:
             print 'Error processing events log.'.format(e)

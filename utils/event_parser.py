@@ -53,7 +53,7 @@ def _parse_event(event_raw_json):
 
     return event_dict
 
-def parse_event_log(self, file_key):
+def parse_event_log(file_key):
     '''
     Read and parse event log corresponding to file_key
 
@@ -86,7 +86,7 @@ def parse_event_log(self, file_key):
     print 'Finished reading file. Time taken: {}'.format(end_time - start_time)
 
     # Convert to json
-    events_response = json.dumps({'file_key': file_key, 'events' : events })
+    events_response = {"file_key" : file_key, "events" : json.dumps(events) }
 
     return events_response
 

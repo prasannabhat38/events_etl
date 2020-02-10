@@ -1,7 +1,10 @@
 from datetime import datetime
+import json
 import os
 
+
 ETL_RUN_DIR = 'events_etl/run'
+OUTPUT_DIR = 'events_etl/output'
 
 def get_etl_run_dir():
     return os.path.join(os.getcwd(), '../' + ETL_RUN_DIR)
@@ -95,6 +98,11 @@ def update_run_status(last_run_status):
     except Exception as e:
         print 'Error updating run status file. {}'.format(e)
 
-def format_event(raw_event):
-    pass
+def dump_output_to_file(file_key, event_response):
+    output_dir = os.path.join(os.getcwd(), '../' + OUTPUT_DIR)
+    file = os.path.join(output_dir, file_key.split('/')[-1])
 
+    print 'Writing output to file: {}'.format(file)
+
+    with open(file, 'w') as f:
+        json.dump(event_response, f)
