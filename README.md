@@ -14,7 +14,7 @@ The S3 location s3://dataeng-challenge/8uht6u8bh/events/ contains a number of ev
 The events should contain the following keys: id, created_at, user_email, ip, event_name and metadata. The metadata is specific to each event, and may contain anything.
 
 # Solution:
-The EventLogProcessor is the main class to process the ETL. The events logs are periodically uploaded to S3 and stored in a directory that follows a date format. The processor will fetch all the keys from the S3 bucket and events dir and pre processes it to see which are the new files to be processed. For this, it creates a 'run' directory containing a 'run_log' (e.g. run_log-2020-01-01.log) file and having all the S3_keys/files processed corresponding to the dated directory.
+The EventLogProcessor is the main class to process the ETL. The events logs are periodically uploaded to S3 and stored in a directory that follows a date format. The processor will fetch all the keys from the S3 bucket in events directory and pre processes it to check for any new files to be processed. For this, it creates a 'run' directory containing a 'run_log' (e.g. run_log-2020-01-01.log) file. The run log will be updated with all the S3_keys/files processed corresponding to the dated directory, so that in the subsequent runs or re-runs we don't have to process the same files. I have added an option for clear_prev_run which set to True, will ignore all the old runs and processes all files.
 
 Below are the processing steps:
 1. Read keys from S3 bucket for event logs
@@ -80,13 +80,14 @@ Sample output from the processed S3 event log:
 
 2. Update AWS access_key_id and secret_access_key in 'events_etl/aws_config'
 
-3. cd events_etl; python -m tests
+3. Run 'cd events_etl; python -m tests'
 
 4. The test will invoke the processor and dump the output in 'events_etl/output' folder
 
 # Further enhancements/ optimisations
 Enhancements:
-* Create a event_sync_log table in DB to maintain the etl run status (start_time, end_time, status).
+* Create a event_sync_log table in SQL DB to maintain the etl run status (start_time, end_time, status).
+* We can also maintain the list of S3 files processed for each run in SQL and attach metadata with it (like errors, # of events processed etc) 
 
 Performance improvements:
 1. Asynchronous processing: Fetch the s3_keys and send each key to a Queue (SQS, ActiveMQ) for asynchronous processing
